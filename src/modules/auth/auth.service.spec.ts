@@ -4,7 +4,7 @@ import { UnauthorizedException, ConflictException, NotFoundException } from '@ne
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service.js';
 import { PrismaService } from '../../database/prisma.service.js';
-import { AdminRole } from '@prisma/client';
+import { AdminRole } from '../../common/enums/admin-role.enum.js';
 import bcrypt from 'bcryptjs';
 
 describe('AuthService', () => {
