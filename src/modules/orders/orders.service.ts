@@ -10,7 +10,6 @@ import { IsnService } from '../isn/isn.service.js';
 import {
   PortalOrderSubmissionDto,
   CalculateQuoteDto,
-  CustomerTypeEnum,
 } from './dto/order-submission.dto.js';
 import { IsnOrderPayload } from '../isn/interfaces/isn.interface.js';
 import { OrderSyncStatus, CustomerType } from '@prisma/client';

@@ -7,6 +7,7 @@ import {
   Param,
   Query,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 import { ContentService } from './content.service.js';
 import {
@@ -17,6 +18,7 @@ import {
   CreateResourceDto,
   UpdateResourceDto,
 } from './dto/content.dto.js';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 
 @Controller('content')
 export class ContentController {
@@ -28,11 +30,13 @@ export class ContentController {
   }
 
   @Post('media')
+  @UseGuards(JwtAuthGuard)
   async createMedia(@Body() body: CreateMediaDto) {
     return this.contentService.createMedia(body);
   }
 
   @Put('media/:id')
+  @UseGuards(JwtAuthGuard)
   async updateMedia(
     @Param('id') id: string,
     @Body() body: UpdateMediaDto,
@@ -41,6 +45,7 @@ export class ContentController {
   }
 
   @Delete('media/:id')
+  @UseGuards(JwtAuthGuard)
   async deleteMedia(@Param('id') id: string) {
     return this.contentService.deleteMedia(id);
   }
@@ -57,11 +62,13 @@ export class ContentController {
   }
 
   @Post('tooltips')
+  @UseGuards(JwtAuthGuard)
   async createTooltip(@Body() body: CreateTooltipDto) {
     return this.contentService.createTooltip(body);
   }
 
   @Put('tooltips/:id')
+  @UseGuards(JwtAuthGuard)
   async updateTooltip(
     @Param('id') id: string,
     @Body() body: UpdateTooltipDto,
@@ -70,6 +77,7 @@ export class ContentController {
   }
 
   @Delete('tooltips/:id')
+  @UseGuards(JwtAuthGuard)
   async deleteTooltip(@Param('id') id: string) {
     return this.contentService.deleteTooltip(id);
   }
@@ -80,11 +88,13 @@ export class ContentController {
   }
 
   @Post('resources')
+  @UseGuards(JwtAuthGuard)
   async createResource(@Body() body: CreateResourceDto) {
     return this.contentService.createResource(body);
   }
 
   @Put('resources/:id')
+  @UseGuards(JwtAuthGuard)
   async updateResource(
     @Param('id') id: string,
     @Body() body: UpdateResourceDto,
@@ -93,6 +103,7 @@ export class ContentController {
   }
 
   @Delete('resources/:id')
+  @UseGuards(JwtAuthGuard)
   async deleteResource(@Param('id') id: string) {
     return this.contentService.deleteResource(id);
   }

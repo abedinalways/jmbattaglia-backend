@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CatalogService } from './catalog.service.js';
 import {
@@ -15,6 +16,7 @@ import {
   QueryPackagesDto,
 } from './dto/package.dto.js';
 import { UpdateServiceDefinitionDto } from './dto/service.dto.js';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 
 @Controller('catalog')
 export class CatalogController {
@@ -31,11 +33,13 @@ export class CatalogController {
   }
 
   @Post('packages')
+  @UseGuards(JwtAuthGuard)
   async createPackage(@Body() body: CreatePackageDto) {
     return this.catalogService.createPackage(body);
   }
 
   @Put('packages/:id')
+  @UseGuards(JwtAuthGuard)
   async updatePackage(
     @Param('id') id: string,
     @Body() body: UpdatePackageDto,
@@ -44,6 +48,7 @@ export class CatalogController {
   }
 
   @Delete('packages/:id')
+  @UseGuards(JwtAuthGuard)
   async deletePackage(@Param('id') id: string) {
     return this.catalogService.deletePackage(id);
   }
@@ -56,11 +61,13 @@ export class CatalogController {
   }
 
   @Post('services/sync-isn')
+  @UseGuards(JwtAuthGuard)
   async syncServicesFromISN() {
     return this.catalogService.syncServicesFromISN();
   }
 
   @Put('services/:id')
+  @UseGuards(JwtAuthGuard)
   async updateService(
     @Param('id') id: string,
     @Body() body: UpdateServiceDefinitionDto,
