@@ -6,3 +6,261 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+enum CustomerType {
+  BUYER
+  SELLER
+  AGENT
+}
+
+enum TargetAudience {
+  BUYER
+  SELLER
+  AGENT
+  ALL
+}
+
+enum ServiceCategory {
+  PRIMARY
+  ANCILLARY
+}
+
+enum MediaType {
+  VIDEO
+  IMAGE
+  DOCUMENT
+}
+
+enum OrderSyncStatus {
+  PENDING
+  DRAFT_CREATED
+  SCHEDULED
+  CONFIRMED
+  FAILED
+}
+
+model AdminUser {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique @db.VarChar(255)
+  passwordHash String    @db.VarChar(255)
+  name         String    @db.VarChar(100)
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("admin_users")
+}
+
+model Package {
+  id                  String                      @id @default(uuid()) @db.Uuid
+  slug                String                      @unique @db.VarChar(120)
+  name                String                      @db.VarChar(150)
+  shortDescription    String                      @db.VarChar(300)
+  detailedDescription String?                     @db.Text
+  badge               String?                     @db.VarChar(50)
+  displayOrder        Int                         @default(0)
+  isFeatured          Boolean                     @default(false)
+  isActive            Boolean                     @default(true)
+  coverImageUrl       String?                     @db.VarChar(500)
+  targetAudience      TargetAudience              @default(ALL)
+  isnPackageId        String?                     @db.VarChar(100)
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+
+  services            PackageService[]
+  features            PackageFeature[]
+  recommendedAddons   PackageAddonRecommendation[]
+  orders              OrderAuditLog[]
+
+  @@index([slug])
+  @@index([isActive, displayOrder])
+  @@map("packages")
+}
+
+model ServiceDefinition {
+  id               String                       @id @default(uuid()) @db.Uuid
+  isnServiceId     String                       @unique @db.VarChar(100)
+  name             String                       @db.VarChar(150)
+  shortDescription String?                      @db.VarChar(300)
+  educationalText  String?                      @db.Text
+  category         ServiceCategory              @default(PRIMARY)
+  isAddon          Boolean                      @default(false)
+  iconUrl          String?                      @db.VarChar(500)
+  videoUrl         String?                      @db.VarChar(500)
+  imageUrl         String?                      @db.VarChar(500)
+  displayOrder     Int                          @default(0)
+  isActive         Boolean                      @default(true)
+  createdAt        DateTime                     @default(now())
+  updatedAt        DateTime                     @updatedAt
+
+  packageServices  PackageService[]
+  recommendedIn    PackageAddonRecommendation[]
+
+  @@index([isnServiceId])
+  @@index([isActive, isAddon])
+  @@map("service_definitions")
+}
+
+model PackageService {
+  id           String            @id @default(uuid()) @db.Uuid
+  packageId    String            @db.Uuid
+  serviceId    String            @db.Uuid
+  isIncluded   Boolean           @default(true)
+  displayOrder Int               @default(0)
+  createdAt    DateTime          @default(now())
+
+  package      Package           @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  service      ServiceDefinition @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([packageId, serviceId])
+  @@index([packageId])
+  @@index([serviceId])
+  @@map("package_services")
+}
+
+model PackageFeature {
+  id           String   @id @default(uuid()) @db.Uuid
+  packageId    String   @db.Uuid
+  title        String   @db.VarChar(200)
+  description  String?  @db.VarChar(500)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  package      Package  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@index([packageId])
+  @@map("package_features")
+}
+
+model PackageAddonRecommendation {
+  id             String            @id @default(uuid()) @db.Uuid
+  packageId      String            @db.Uuid
+  addonServiceId String            @db.Uuid
+  pitchText      String?           @db.VarChar(300)
+  displayOrder   Int               @default(0)
+  createdAt      DateTime          @default(now())
+
+  package        Package           @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  addonService   ServiceDefinition @relation(fields: [addonServiceId], references: [id], onDelete: Cascade)
+
+  @@unique([packageId, addonServiceId])
+  @@index([packageId])
+  @@index([addonServiceId])
+  @@map("package_addon_recommendations")
+}
+
+model EducationalMedia {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String    @db.VarChar(150)
+  type         MediaType @default(VIDEO)
+  url          String    @db.VarChar(500)
+  thumbnailUrl String?   @db.VarChar(500)
+  sectionKey   String    @db.VarChar(100)
+  description  String?   @db.Text
+  displayOrder Int       @default(0)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([sectionKey, isActive])
+  @@map("educational_media")
+}
+
+model Tooltip {
+  id          String   @id @default(uuid()) @db.Uuid
+  fieldKey    String   @unique @db.VarChar(100)
+  label       String   @db.VarChar(120)
+  helpText    String   @db.Text
+  exampleText String?  @db.VarChar(255)
+  stepIndex   Int      @default(1)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([fieldKey])
+  @@index([stepIndex, isActive])
+  @@map("tooltips")
+}
+
+model ResourceItem {
+  id           String   @id @default(uuid()) @db.Uuid
+  title        String   @db.VarChar(150)
+  description  String?  @db.VarChar(500)
+  fileUrl      String   @db.VarChar(500)
+  fileType     String   @db.VarChar(50)
+  category     String   @db.VarChar(80)
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([category, isActive])
+  @@map("resource_items")
+}
+
+model OrderAuditLog {
+  id                  String          @id @default(uuid()) @db.Uuid
+  orderNumber         String          @unique @db.VarChar(50)
+  isnOrderId          String?         @db.VarChar(100)
+  isnOid              Int?
+  status              OrderSyncStatus @default(PENDING)
+  customerType        CustomerType    @default(BUYER)
+
+  clientName          String          @db.VarChar(150)
+  clientEmail         String          @db.VarChar(255)
+  clientPhone         String          @db.VarChar(50)
+
+  agentName           String?         @db.VarChar(150)
+  agentEmail          String?         @db.VarChar(255)
+  agentPhone          String?         @db.VarChar(50)
+
+  propertyAddress     String          @db.VarChar(255)
+  city                String          @db.VarChar(100)
+  state               String          @db.VarChar(50)
+  zip                 String          @db.VarChar(20)
+  squareFeet          Int?
+  yearBuilt           Int?
+
+  scheduledDateTime   DateTime
+  estimatedDuration   Int?
+  inspectorUuid       String?         @db.VarChar(100)
+  inspectorName       String?         @db.VarChar(150)
+
+  packageId           String?         @db.Uuid
+  package             Package?        @relation(fields: [packageId], references: [id], onDelete: SetNull)
+
+  selectedServices    Json
+  calculatedQuote     Decimal?        @db.Decimal(10, 2)
+
+  isnRequestPayload   Json?
+  isnResponsePayload  Json?
+  failureReason       String?         @db.Text
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  @@index([orderNumber])
+  @@index([isnOrderId])
+  @@index([status])
+  @@index([clientEmail])
+  @@index([createdAt])
+  @@map("order_audit_logs")
+}
+
+model ISNCache {
+  key       String   @id @db.VarChar(100)
+  data      Json
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([expiresAt])
+  @@map("isn_cache")
+}
