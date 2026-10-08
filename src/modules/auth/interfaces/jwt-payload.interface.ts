@@ -1,4 +1,4 @@
-import { AdminRole } from '@prisma/client';
+import { AdminRole } from '../../../common/enums/admin-role.enum.js';
 
 export interface JwtPayload {
   sub: string;

@@ -15,7 +15,7 @@ import { RolesGuard } from '../../common/guards/roles.guard.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { SanitizedAdminUser } from './interfaces/jwt-payload.interface.js';
-import { AdminRole } from '@prisma/client';
+import { AdminRole } from '../../common/enums/admin-role.enum.js';
 
 @Controller('auth')
 export class AuthController {
