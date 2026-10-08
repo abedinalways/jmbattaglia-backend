@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
-import { AdminRole } from '@prisma/client';
+import { AdminRole } from '../../../common/enums/admin-role.enum.js';
 
 export class CreateAdminDto {
   @IsEmail({}, { message: 'Must provide a valid email address' })

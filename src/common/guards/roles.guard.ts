@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AdminRole } from '@prisma/client';
+import { AdminRole } from '../enums/admin-role.enum.js';
 import { ROLES_KEY } from '../decorators/roles.decorator.js';
 
 @Injectable()

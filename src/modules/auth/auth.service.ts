@@ -14,7 +14,7 @@ import {
   JwtPayload,
   SanitizedAdminUser,
 } from './interfaces/jwt-payload.interface.js';
-import { AdminRole } from '@prisma/client';
+import { AdminRole } from '../../common/enums/admin-role.enum.js';
 
 @Injectable()
 export class AuthService {
